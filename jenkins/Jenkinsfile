@@ -5,11 +5,10 @@ pipeline {
             steps {
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
-                        sh 'mkdir -p /home/vagrant/ && cd /home/vagrant && git clone '
-                        sh 'bash /home/vagrant/jenkins+docker+nginx/scripts/install_utilites.sh'
+                        sh 'mkdir -p /home/vagrant/ && cd /home/vagrant && git clone https://github.com/SebastianUA/jenkins-docker-nginx.git'
+                        sh 'bash /home/vagrant/jenkins-docker-nginx/scripts/install_utilites.sh'
                         sh '''
-                            echo "Multiline shell steps works too"
-                            ls -lah
+                            bash /home/vagrant/jenkins-docker-nginx/scripts/install_nginx_lua.sh
                         '''
                     }
                 }
@@ -18,11 +17,19 @@ pipeline {
     stage('Dockerize') {
             steps {
                 retry(3) {
-                    sh './flakey-deploy.sh'
+                    sh '''
+                        cd /home/vagrant && git clone https://github.com/SebastianUA/jenkins-docker-nginx.git'
+                        time docker build -t centos7/nginx_lua -f /home/vagrant/jenkins-docker-nginx/docker/Dockerfile .
+                        export DOCKER_ID_USER="captainua"
+                        docker login -u $DOCKER_ID_USER
+                        docker tag centos7/nginx_lua $DOCKER_ID_USER/nginx_lua
+                        docker push centos7/nginx_lua
+                    '''    
                 }
 
                 timeout(time: 3, unit: 'MINUTES') {
-                    sh 'bash /home/vagrant/jenkins+docker+nginx/scripts/install_utilites.sh'
+                    sh 'mkdir -p /home/vagrant/ && cd /home/vagrant && git clone https://github.com/SebastianUA/jenkins-docker-nginx.git'
+                    sh 'bash /home/vagrant/jenkins-docker-nginx/scripts/install_utilites.sh'
                 }
             }
         }
@@ -30,7 +37,13 @@ pipeline {
             steps {
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
-                        sh 'bash /home/vagrant/jenkins+docker+nginx/scripts/install_utilites.sh'
+                        sh '''
+                            mkdir -p /home/vagrant/ && cd /home/vagrant && git clone https://github.com/SebastianUA/jenkins-docker-nginx.git
+                            bash /home/vagrant/jenkins-docker-nginx/scripts/install_utilites.sh
+                            export ACCESS_KEY="XXXXXXXXXX"
+                            export SECRET_KEY="YYYYYYYYYY"
+                            docker-machine create --driver amazonec2 --amazonec2-access-key $ACCESS_KEY --amazonec2-secret-key $SECRET_KEY  --amazonec2-open-port 80 --amazonec2-open-port 443 aws-nginx-lua
+                        '''
                     }
                 }
             }

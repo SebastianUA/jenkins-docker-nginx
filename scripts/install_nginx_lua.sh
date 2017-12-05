@@ -1,11 +1,17 @@
-# get image from...
-FROM centos:7
-# maintainer
-MAINTAINER Vitaliy Natarov "vitaliy.natarov@yahoo.com"
+#!/bin/bash -x
+
+# CREATED:
+# vitaliy.natarov@yahoo.com
+#
+# Unix/Linux blog:
+# http://linux-notes.org
+# Vitaliy Natarov
+#
+
 # updates
-RUN yum -y update; yum clean all
+yum -y update; yum clean all
 # install some utilites 
-RUN yum install -y \
+yum install -y \
 		epel-release \
 		git \
 		curl \
@@ -24,23 +30,23 @@ RUN yum install -y \
         zlib-devel \
         pcre-devel
 # modules
-RUN cd /usr/local/src && git clone http://luajit.org/git/luajit-2.0.git && cd luajit-2.0 && make && make install
-RUN cd /usr/local/src && curl -R -O http://www.lua.org/ftp/lua-5.3.4.tar.gz && tar zxf lua-5.3.4.tar.gz && cd lua-5.3.4 && make linux test 
-RUN cd /usr/local/src && git clone https://github.com/simpl/ngx_devel_kit.git 
-RUN cd /usr/local/src && git clone https://github.com/openresty/lua-nginx-module.git
+cd /usr/local/src && git clone http://luajit.org/git/luajit-2.0.git && cd luajit-2.0 && make && make install
+cd /usr/local/src && curl -R -O http://www.lua.org/ftp/lua-5.3.4.tar.gz && tar zxf lua-5.3.4.tar.gz && cd lua-5.3.4 && make linux test 
+cd /usr/local/src && git clone https://github.com/simpl/ngx_devel_kit.git 
+cd /usr/local/src && git clone https://github.com/openresty/lua-nginx-module.git
 
-RUN cd /usr/local/src && wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.41.tar.gz && tar -xzvf pcre-8.41.tar.gz && cd pcre-8.41 && ./configure --enable-jit && make && make install
-RUN cd /usr/local/src && wget https://www.openssl.org/source/openssl-1.0.2m.tar.gz && tar -xzvf openssl-1.0.2m.tar.gz && cd openssl-1.0.2m && ./config && make && make install
+cd /usr/local/src && wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.41.tar.gz && tar -xzvf pcre-8.41.tar.gz && cd pcre-8.41 && ./configure --enable-jit && make && make install
+cd /usr/local/src && wget https://www.openssl.org/source/openssl-1.0.2m.tar.gz && tar -xzvf openssl-1.0.2m.tar.gz && cd openssl-1.0.2m && ./config && make && make install
 
 # tell nginx's build system where to find LuaJIT 2.0:
-ENV LUAJIT_LIB /usr/local/lib/
-ENV LUAJIT_INC /usr/local/include/luajit-2.0
+export LUAJIT_LIB=/usr/local/lib/
+export LUAJIT_INC=/usr/local/include/luajit-2.0
 
 # create group and user for nginx
-RUN groupadd nginx && useradd --no-create-home nginx -g nginx
+groupadd nginx && useradd --no-create-home nginx -g nginx
 
 # nginx 
-RUN cd /usr/local/src && wget https://nginx.org/download/nginx-1.13.7.tar.gz && tar -vzxf nginx-1.13.7.tar.gz && cd nginx-1.13.7 \
+cd /usr/local/src && wget https://nginx.org/download/nginx-1.13.7.tar.gz && tar -vzxf nginx-1.13.7.tar.gz && cd nginx-1.13.7 \
 
 && ./configure \
 		--with-ld-opt="-Wl,-rpath,/usr/local/lib/" \
@@ -93,29 +99,8 @@ RUN cd /usr/local/src && wget https://nginx.org/download/nginx-1.13.7.tar.gz && 
 
 && make -j2 && make install
 # Add additional binaries into PATH for convenience
-ENV PATH=$PATH:/usr/local/bin/:/usr/local/sbin/:/usr/bin/:/usr/sbin/
+export PATH=$PATH:/usr/local/bin/:/usr/local/sbin/:/usr/bin/:/usr/sbin/
 
-RUN mkdir -p /var/cache/nginx/client_temp && mkdir -p /etc/nginx/conf.d
+mkdir -p /var/cache/nginx/client_temp && mkdir -p /etc/nginx/conf.d
 
-WORKDIR /usr/share/nginx/html
-# Copy nginx configuration files
-COPY /home/vagrant/jenkins-docker-nginx/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY /home/vagrant/jenkins-docker-nginx/nginx/default.conf /etc/nginx/conf.d/default.conf 
-
-RUN echo "NGINX with lua on CentOS 7 inside Docker" > /usr/share/nginx/html/index.html 
-
-#RUN rm -rf /usr/local/src/* \
-#	&& yum clean all
-RUN rm -rf /usr/local/src/*.tar.gz
-
-# forward request and error logs to docker log collector
-RUN ln -sf /dev/stdout /var/log/nginx/access.log \
-	&& ln -sf /dev/stderr /var/log/nginx/error.log
-
-# allow port(s) 
-EXPOSE 22 80 443
-#
-#STOPSIGNAL SIGTERM
-
-# This is the default CMD used by nginx:1.9.2 image
-CMD ["nginx", "-g", "daemon off;"]
+rm -rf /usr/local/src/*.tar.gz
