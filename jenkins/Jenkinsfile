@@ -1,7 +1,9 @@
-Jenkinsfile (Declarative Pipeline)
+#!groovy
+
 pipeline {
     agent any
-    stage('Build') {
+    stages {
+        stage('Build') {
             steps {
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
@@ -14,7 +16,7 @@ pipeline {
                 }
             }
         }
-    stage('Dockerize') {
+        stage('Dockerize') {
             steps {
                 retry(3) {
                     sh '''
@@ -33,7 +35,7 @@ pipeline {
                 }
             }
         }
-    stage('Deploy') {
+        stage('Deploy') {
             steps {
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
@@ -47,7 +49,8 @@ pipeline {
                     }
                 }
             }
-        }         
+        }
+    }             
     post {
         always {
             echo 'This will always run'
