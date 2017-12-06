@@ -108,9 +108,9 @@ export PATH=$PATH:/usr/local/bin/:/usr/local/sbin/:/usr/bin/:/usr/sbin/
 
 mkdir -p /var/cache/nginx/client_temp && mkdir -p /etc/nginx/conf.d
 
-cp -rf ./nginx/nginx.conf /etc/nginx/nginx.conf
-cp -rf ./nginx/default.conf /etc/nginx/conf.d/nginx.conf
-cp -rf ./nginx/nginx_init_script_centos /etc/init.d/nginx
+cp -rf ./jenkins-docker-nginx/nginx/nginx.conf /etc/nginx/nginx.conf
+cp -rf ./jenkins-docker-nginx/nginx/default.conf /etc/nginx/conf.d/nginx.conf
+cp -rf ./jenkins-docker-nginx/nginx/nginx_init_script_centos /etc/init.d/nginx
 chmod +x /etc/init.d/nginx
 
 rm -rf ~/build/*.tar.gz
