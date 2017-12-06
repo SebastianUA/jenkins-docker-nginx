@@ -10,10 +10,13 @@ pipeline {
             steps {
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
-                        sh 'cd ~ && git clone https://github.com/SebastianUA/jenkins-docker-nginx.git'
-                        sh 'bash ~/jenkins-docker-nginx/scripts/install_utilites.sh'
                         sh '''
-                            bash ~/jenkins-docker-nginx/scripts/install_nginx_lua.sh
+                        cd ~
+                        if [ -d "~/jenkins-docker-nginx" ]; then
+                            git clone https://github.com/SebastianUA/jenkins-docker-nginx.git
+                        fi
+                        bash ~/jenkins-docker-nginx/scripts/install_utilites.sh
+                        bash ~/jenkins-docker-nginx/scripts/install_nginx_lua.sh
                         '''
                     }
                 }
@@ -23,7 +26,10 @@ pipeline {
             steps {
                 retry(3) {
                     sh '''
-                        cd ~ && git clone https://github.com/SebastianUA/jenkins-docker-nginx.git'
+                        cd ~
+                        if [ -d "~/jenkins-docker-nginx" ]; then
+                            git clone https://github.com/SebastianUA/jenkins-docker-nginx.git
+                        fi
                         time docker build -t centos7/nginx_lua -f ~/jenkins-docker-nginx/docker/Dockerfile .
                         export DOCKER_ID_USER="captainua"
                         docker login -u $DOCKER_ID_USER
@@ -33,8 +39,13 @@ pipeline {
                 }
 
                 timeout(time: 3, unit: 'MINUTES') {
-                    sh 'cd ~ && git clone https://github.com/SebastianUA/jenkins-docker-nginx.git'
-                    sh 'bash ~/jenkins-docker-nginx/scripts/install_utilites.sh'
+                    sh '''
+                        cd ~
+                        if [ -d "~/jenkins-docker-nginx" ]; then
+                            git clone https://github.com/SebastianUA/jenkins-docker-nginx.git
+                        fi
+                        bash ~/jenkins-docker-nginx/scripts/install_utilites.sh
+                    '''   
                 }
             }
         }

@@ -35,7 +35,7 @@ if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] ; then
 		service docker restart
 	else echo "docker INSTALLED"; 
 	fi	
-	curl -L https://github.com/docker/machine/releases/download/v0.13.0/docker-machine-`uname -s`-`uname -m` >/usr/local/src/docker-machine && chmod +x /usr/local/src/docker-machine && sudo mv /tmp/docker-machine /usr/local/bin/docker-machine
+	#curl -L https://github.com/docker/machine/releases/download/v0.13.0/docker-machine-`uname -s`-`uname -m` >/usr/local/src/docker-machine && chmod +x /usr/local/src/docker-machine && sudo mv /tmp/docker-machine /usr/local/bin/docker-machine
 
 elif [ -f /etc/fedora_version ]; then
 	 echo "Fedora";
