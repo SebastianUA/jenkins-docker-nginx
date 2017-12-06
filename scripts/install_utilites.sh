@@ -8,10 +8,34 @@
 # Vitaliy Natarov
 #
 
+# Set some colors for status OK, FAIL and titles
+SETCOLOR_SUCCESS="echo -en \\033[1;32m"
+SETCOLOR_FAILURE="echo -en \\033[1;31m"
+SETCOLOR_NORMAL="echo -en \\033[0;39m"
+
+SETCOLOR_TITLE="echo -en \\033[1;36m" #Fuscia
+SETCOLOR_TITLE_GREEN="echo -en \\033[0;32m" #green
+SETCOLOR_NUMBERS="echo -en \\033[0;34m" #BLUE
+
+function Operation_status {
+     if [ $? -eq 0 ]; then
+         $SETCOLOR_SUCCESS;
+         echo -n "$(tput hpa $(tput cols))$(tput cub 6)[OK]"
+         $SETCOLOR_NORMAL;
+             echo;
+     else
+        $SETCOLOR_FAILURE;
+        echo -n "$(tput hpa $(tput cols))$(tput cub 6)[fail]"
+        $SETCOLOR_NORMAL;
+        echo;
+     fi
+}
+
+
 if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] ; then
     echo "RedHat or CentOS";
-    Redhat-lsb-core="rpm -qa | grep redhat-lsb-core"
-	if [ ! -n "`$Redhat-lsb-core`"]; then 
+    Redhat-lsb-core="rpm -qa | grep -E 'redhat-lsb-core'"
+	if [ ! -n "$( $Redhat-lsb-core)"]; then 
 		yum install redhat-lsb-core -y 
 	fi
     #
