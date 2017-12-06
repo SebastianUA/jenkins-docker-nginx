@@ -8,28 +8,6 @@
 # Vitaliy Natarov
 #
 
-# Set some colors for status OK, FAIL and titles
-SETCOLOR_SUCCESS="echo -en \\033[1;32m"
-SETCOLOR_FAILURE="echo -en \\033[1;31m"
-SETCOLOR_NORMAL="echo -en \\033[0;39m"
-
-SETCOLOR_TITLE="echo -en \\033[1;36m" #Fuscia
-SETCOLOR_TITLE_GREEN="echo -en \\033[0;32m" #green
-SETCOLOR_NUMBERS="echo -en \\033[0;34m" #BLUE
-
-function Operation_status {
-     if [ $? -eq 0 ]; then
-         $SETCOLOR_SUCCESS;
-         echo -n "$(tput hpa $(tput cols))$(tput cub 6)[OK]"
-         $SETCOLOR_NORMAL;
-             echo;
-     else
-        $SETCOLOR_FAILURE;
-        echo -n "$(tput hpa $(tput cols))$(tput cub 6)[fail]"
-        $SETCOLOR_NORMAL;
-        echo;
-     fi
-}
 
 
 if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] ; then
@@ -44,16 +22,14 @@ if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] ; then
 	OS_MINOR_VERSION=`sed -rn 's/.*[0-9].([0-9]).*/\1/p' /etc/redhat-release`
 	Bit_OS=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/')
 	#
-	$SETCOLOR_GREEN
 	echo "$OS-$OS_MAJOR_VERSION.$OS_MINOR_VERSION with $Bit_OS bit arch"
-	$SETCOLOR_NORMAL
 	#
 	# install some utilites
 	if ! type -path "wget" > /dev/null 2>&1; then yum install wget -y; else echo "wget INSTALLED"; fi
 	if ! type -path "git" > /dev/null 2>&1; then yum install git -y; else echo "git INSTALLED"; fi
 	#
 	if ! type -path "docker" > /dev/null 2>&1; then
-		yum install -y yum-utils makecache fast
+		yum install -y yum-utils makecache fast glib*
 		yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 		yum -y install docker-ce
 		service docker restart
@@ -69,9 +45,7 @@ elif [ -f /etc/fedora_version ]; then
 	 OS_MINOR_VERSION=`sed -rn 's/.*[0-9].([0-9]).*/\1/p' /etc/fedora_version`
 	 Bit_OS=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/') 
 	 #
-	 $SETCOLOR_GREEN
 	 echo "$OS-$OS_MAJOR_VERSION.$OS_MINOR_VERSION($CODENAME) with $Bit_OS bit arch"
-	 $SETCOLOR_NORMAL
 	 # 
 elif [ -f /etc/debian_version ]; then
     echo "Debian/Ubuntu/Kali Linux";
@@ -85,9 +59,7 @@ elif [ -f /etc/debian_version ]; then
 	CODENAME=${CODENAME##*\(}
 	CODENAME=${CODENAME%%\)*}
 	#
-	$SETCOLOR_GREEN
 	echo "$OS-$OS_MAJOR_VERSION.$OS_MINOR_VERSION($CODENAME) with $Bit_OS bit arch"
-	$SETCOLOR_NORMAL
 	#
 	# install some utilites
 	if ! type -path "wget" > /dev/null 2>&1; then apt-get install wget -y; else echo "wget INSTALLED"; fi
@@ -99,7 +71,7 @@ elif [ -f /etc/debian_version ]; then
 		service docker restart
 	else echo "docker INSTALLED"; 
 	fi
-	curl -L https://github.com/docker/machine/releases/download/v0.13.0/docker-machine-`uname -s`-`uname -m` >/tmp/docker-machine && chmod +x /tmp/docker-machine && mv /tmp/docker-machine /usr/local/bin/docker-machine	
+	# curl -L https://github.com/docker/machine/releases/download/v0.13.0/docker-machine-`uname -s`-`uname -m` >/tmp/docker-machine && chmod +x /tmp/docker-machine && mv /tmp/docker-machine /usr/local/bin/docker-machine	
 elif [ -f /usr/sbin/system_profiler ]; then
 	echo "MacOS!";
 	#
@@ -107,9 +79,7 @@ elif [ -f /usr/sbin/system_profiler ]; then
 	Mac_Ver=$(sw_vers -productVersion | awk -F '.' '{print $1 "." $2}')
 	Bit_OS=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/')
 	#
-	$SETCOLOR_GREEN
 	echo "$OS-$Mac_Ver with $Bit_OS bit arch"
-	$SETCOLOR_NORMAL
 	#
 else
     OS=$(uname -s)
