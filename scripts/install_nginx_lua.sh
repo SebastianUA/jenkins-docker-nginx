@@ -47,9 +47,9 @@ export LUAJIT_INC=/usr/local/include/luajit-2.0
 sudo groupadd nginx && useradd --no-create-home nginx -g nginx
 
 # nginx 
-cd ~/build && wget https://nginx.org/download/nginx-1.13.7.tar.gz && tar -vzxf nginx-1.13.7.tar.gz && cd nginx-1.13.7 \
+cd ~/build && wget https://nginx.org/download/nginx-1.13.7.tar.gz && tar -vzxf nginx-1.13.7.tar.gz && cd nginx-1.13.7
 
-&& ./configure \
+./configure \
 		--with-ld-opt="-Wl,-rpath,/usr/local/lib/" \
 		--prefix=/etc/nginx \
 		--sbin-path=/usr/sbin/nginx \
@@ -98,7 +98,7 @@ cd ~/build && wget https://nginx.org/download/nginx-1.13.7.tar.gz && tar -vzxf n
 		--add-module=~/build/ngx_devel_kit \
 		--add-module=~/build/lua-nginx-module \
 
-&& make -j2 && make install
+make -j2 && make install
 # Add additional binaries into PATH for convenience
 export PATH=$PATH:/usr/local/bin/:/usr/local/sbin/:/usr/bin/:/usr/sbin/
 
