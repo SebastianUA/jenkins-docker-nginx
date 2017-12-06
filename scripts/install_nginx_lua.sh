@@ -30,7 +30,11 @@ yum install -y \
         zlib-devel \
         pcre-devel
 # modules
-mkdir ~/build
+if [ -d '~/build' ]; then
+	rm -rf ~/build
+	mkdir ~/build
+fi
+
 cd ~/build && git clone http://luajit.org/git/luajit-2.0.git && cd luajit-2.0 && make && make install
 cd ~/build && curl -R -O http://www.lua.org/ftp/lua-5.3.4.tar.gz && tar zxf lua-5.3.4.tar.gz && cd lua-5.3.4 && make linux test 
 cd ~/build && git clone https://github.com/simpl/ngx_devel_kit.git 
@@ -103,5 +107,10 @@ make -j2 && make install
 export PATH=$PATH:/usr/local/bin/:/usr/local/sbin/:/usr/bin/:/usr/sbin/
 
 mkdir -p /var/cache/nginx/client_temp && mkdir -p /etc/nginx/conf.d
+
+cp -rf ./nginx/nginx.conf /etc/nginx/nginx.conf
+cp -rf ./nginx/default.conf /etc/nginx/conf.d/nginx.conf
+cp -rf ./nginx/nginx_init_script_centos /etc/init.d/nginx
+chmod +x /etc/init.d/nginx
 
 rm -rf ~/build/*.tar.gz
