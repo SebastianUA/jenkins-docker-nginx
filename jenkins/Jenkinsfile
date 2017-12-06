@@ -1,9 +1,4 @@
 #!groovy
-Jenkinsfile (Declarative Pipeline)
-
-# https://jenkins.io/doc/pipeline/tour/post/
-# https://jenkins.io/doc/book/pipeline/jenkinsfile/
-
 
 pipeline {
     agent any
@@ -15,7 +10,7 @@ pipeline {
             steps {
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
-                        sh 'cd ~ && git clone https://github.com/SebastianUA/jenkins-docker-nginx.git'
+                        sh 'cd ~'
                         sh 'bash ~/jenkins-docker-nginx/scripts/install_utilites.sh'
                         sh '''
                             bash ~/jenkins-docker-nginx/scripts/install_nginx_lua.sh
@@ -28,7 +23,7 @@ pipeline {
             steps {
                 retry(3) {
                     sh '''
-                        cd ~ && git clone https://github.com/SebastianUA/jenkins-docker-nginx.git'
+                        cd ~
                         time docker build -t centos7/nginx_lua -f ~/jenkins-docker-nginx/docker/Dockerfile .
                         export DOCKER_ID_USER="captainua"
                         docker login -u $DOCKER_ID_USER
@@ -38,7 +33,7 @@ pipeline {
                 }
 
                 timeout(time: 3, unit: 'MINUTES') {
-                    sh 'cd ~ && git clone https://github.com/SebastianUA/jenkins-docker-nginx.git'
+                    sh 'cd ~'
                     sh 'bash ~/jenkins-docker-nginx/scripts/install_utilites.sh'
                 }
             }
@@ -50,7 +45,7 @@ pipeline {
                         sh '''
                             cd ~ && git clone https://github.com/SebastianUA/jenkins-docker-nginx.git
                             bash ~/jenkins-docker-nginx/scripts/install_utilites.sh
-                            # bash ~/jenkins-docker-nginx/scripts/create_aws_node.sh
+                            
                             export ACCESS_KEY="XXXXXXXXXX"
                             export SECRET_KEY="YYYYYYYYYY"
                             docker-machine create --driver amazonec2 --amazonec2-access-key $ACCESS_KEY --amazonec2-secret-key $SECRET_KEY  --amazonec2-open-port 80 --amazonec2-open-port 443 aws-nginx-lua
