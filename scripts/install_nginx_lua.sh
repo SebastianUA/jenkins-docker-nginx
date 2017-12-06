@@ -30,23 +30,24 @@ yum install -y \
         zlib-devel \
         pcre-devel
 # modules
-cd /usr/local/src && git clone http://luajit.org/git/luajit-2.0.git && cd luajit-2.0 && make && make install
-cd /usr/local/src && curl -R -O http://www.lua.org/ftp/lua-5.3.4.tar.gz && tar zxf lua-5.3.4.tar.gz && cd lua-5.3.4 && make linux test 
-cd /usr/local/src && git clone https://github.com/simpl/ngx_devel_kit.git 
-cd /usr/local/src && git clone https://github.com/openresty/lua-nginx-module.git
+mkdir ~/build
+cd ~/build && git clone http://luajit.org/git/luajit-2.0.git && cd luajit-2.0 && make && make install
+cd ~/build && curl -R -O http://www.lua.org/ftp/lua-5.3.4.tar.gz && tar zxf lua-5.3.4.tar.gz && cd lua-5.3.4 && make linux test 
+cd ~/build && git clone https://github.com/simpl/ngx_devel_kit.git 
+cd ~/build && git clone https://github.com/openresty/lua-nginx-module.git
 
-cd /usr/local/src && wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.41.tar.gz && tar -xzvf pcre-8.41.tar.gz && cd pcre-8.41 && ./configure --enable-jit && make && make install
-cd /usr/local/src && wget https://www.openssl.org/source/openssl-1.0.2m.tar.gz && tar -xzvf openssl-1.0.2m.tar.gz && cd openssl-1.0.2m && ./config && make && make install
+cd ~/build && wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.41.tar.gz && tar -xzvf pcre-8.41.tar.gz && cd pcre-8.41 && ./configure --enable-jit && make && make install
+cd ~/build && wget https://www.openssl.org/source/openssl-1.0.2m.tar.gz && tar -xzvf openssl-1.0.2m.tar.gz && cd openssl-1.0.2m && ./config && make && make install
 
 # tell nginx's build system where to find LuaJIT 2.0:
 export LUAJIT_LIB=/usr/local/lib/
 export LUAJIT_INC=/usr/local/include/luajit-2.0
 
 # create group and user for nginx
-groupadd nginx && useradd --no-create-home nginx -g nginx
+sudo groupadd nginx && useradd --no-create-home nginx -g nginx
 
 # nginx 
-cd /usr/local/src && wget https://nginx.org/download/nginx-1.13.7.tar.gz && tar -vzxf nginx-1.13.7.tar.gz && cd nginx-1.13.7 \
+cd ~/build && wget https://nginx.org/download/nginx-1.13.7.tar.gz && tar -vzxf nginx-1.13.7.tar.gz && cd nginx-1.13.7 \
 
 && ./configure \
 		--with-ld-opt="-Wl,-rpath,/usr/local/lib/" \
@@ -94,8 +95,8 @@ cd /usr/local/src && wget https://nginx.org/download/nginx-1.13.7.tar.gz && tar 
 		--with-pcre-jit \
 		--with-pcre=../pcre-8.41 \
 		--with-openssl=../openssl-1.0.2m \
-		--add-module=/usr/local/src/ngx_devel_kit \
-		--add-module=/usr/local/src/lua-nginx-module \
+		--add-module=~/build/ngx_devel_kit \
+		--add-module=~/build/lua-nginx-module \
 
 && make -j2 && make install
 # Add additional binaries into PATH for convenience
@@ -103,4 +104,4 @@ export PATH=$PATH:/usr/local/bin/:/usr/local/sbin/:/usr/bin/:/usr/sbin/
 
 mkdir -p /var/cache/nginx/client_temp && mkdir -p /etc/nginx/conf.d
 
-rm -rf /usr/local/src/*.tar.gz
+rm -rf ~/build/*.tar.gz
