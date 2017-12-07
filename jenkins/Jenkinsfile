@@ -31,10 +31,7 @@ pipeline {
                             git clone https://github.com/SebastianUA/jenkins-docker-nginx.git
                         fi
                         time docker build -t centos7/nginx_lua -f ~/jenkins-docker-nginx/docker/Dockerfile .
-                        export DOCKER_ID_USER="captainua"
-                        docker login -u $DOCKER_ID_USER
-                        docker tag centos7/nginx_lua $DOCKER_ID_USER/nginx_lua
-                        docker push centos7/nginx_lua
+                        bash ~/jenkins-docker-nginx/scripts/deploy_image_to_dockerhub.sh -u DOCKER_ID_USER -p DOCKER_ID_USER_PASSWORD
                     '''    
                 }
 
@@ -54,12 +51,12 @@ pipeline {
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
                         sh '''
-                            cd ~ && git clone https://github.com/SebastianUA/jenkins-docker-nginx.git
+                            cd ~
+                            if [ -d "~/jenkins-docker-nginx" ]; then
+                                git clone https://github.com/SebastianUA/jenkins-docker-nginx.git
+                            fi
                             bash ~/jenkins-docker-nginx/scripts/install_utilites.sh
-                            
-                            export ACCESS_KEY="XXXXXXXXXX"
-                            export SECRET_KEY="YYYYYYYYYY"
-                            docker-machine create --driver amazonec2 --amazonec2-access-key $ACCESS_KEY --amazonec2-secret-key $SECRET_KEY  --amazonec2-open-port 80 --amazonec2-open-port 443 aws-nginx-lua
+                            bash ~/jenkins-docker-nginx/scripts/create_machine_in_ec2.sh -u DOCKER_ID_USER -a ACCESS_KEY_from_AWS -s SECRET_KEY_from_AWS      
                         '''
                     }
                 }
