@@ -39,9 +39,10 @@ LATEST_TAG=$(wget -q https://registry.hub.docker.com/v1/repositories/captainua/n
 CUT_TAG_NUMBER=$(echo $LATEST_TAG | cut -c8- | cut -d"." -f1)
 CURRENT_TAG=$(($CUT_TAG_NUMBER))
 
-docker-machine create --driver amazonec2 --amazonec2-access-key $ACCESS_KEY --amazonec2-secret-key $SECRET_KEY --amazonec2-region us-east-1 --amazonec2-open-port 80 --amazonec2-open-port 443 --amazonec2-vpc-id vpc-3cdc1145 --amazonec2-ami ami-46c1b650 nginx-lua-version$CURRENT_TAG.0    
+docker-machine create --driver amazonec2 --amazonec2-access-key $ACCESS_KEY --amazonec2-secret-key $SECRET_KEY --amazonec2-region us-east-1 --amazonec2-open-port 80 --amazonec2-open-port 443 --amazonec2-vpc-id vpc-3cdc1145 nginx-lua-version$CURRENT_TAG.0    
 docker-machine restart nginx-lua-version$CURRENT_TAG.0
 docker-machine ssh nginx-lua-version$CURRENT_TAG.0
 docker pull $DOCKER_ID_USER/nginx_lua:version$CURRENT_TAG.0
-
+sudo docker run -d -p 80:80 -p 443:443 $DOCKER_ID_USER/nginx_lua:version$CURRENT_TAG.0
+exit
 echo "Done!"
